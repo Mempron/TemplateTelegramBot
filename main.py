@@ -9,9 +9,10 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
 from redis import Redis
 
-from aiobot.config import load_config
+from aiobot.config import load_config, Config
 from aiobot.models.database import Base
 from aiobot.middlewares.database import DatabaseMiddleware
+from aiobot.middlewares.config import ConfigMiddleware
 from aiobot.middlewares.acl import AccessControlListMiddleware
 from aiobot.handlers.user import user_router
 from aiobot.handlers.admin import admin_router
@@ -23,9 +24,10 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def setup_all_middlewares(dp: Dispatcher, async_sessionmaker: sessionmaker) -> None:
+def setup_all_middlewares(dp: Dispatcher, async_sessionmaker: sessionmaker, config: Config) -> None:
     dp.update.outer_middleware(UserContextMiddleware())
     dp.update.outer_middleware(DatabaseMiddleware(async_sessionmaker))
+    # dp.update.outer_middleware(ConfigMiddleware(config))
     dp.update.outer_middleware(AccessControlListMiddleware())
 
 
@@ -51,7 +53,7 @@ async def main() -> None:
     storage = RedisStorage(Redis) if config.bot.use_redis else MemoryStorage()
     dp = Dispatcher(storage=storage)
 
-    setup_all_middlewares(dp, async_sessionmaker)
+    setup_all_middlewares(dp, async_sessionmaker, config)
     include_all_routers(dp)
 
     try:

@@ -2,14 +2,14 @@ from typing import Callable, Dict, Any, Awaitable
 
 from aiogram import BaseMiddleware
 from aiogram.types import TelegramObject
-from sqlalchemy.orm import sessionmaker
+
+from ..config import Config
 
 
-class DatabaseMiddleware(BaseMiddleware):
-
-    def __init__(self, async_sessionmaker: sessionmaker) -> None:
+class ConfigMiddleware(BaseMiddleware):
+    def __init__(self, config: Config) -> None:
         super().__init__()
-        self.async_sessionmaker = async_sessionmaker
+        self.config = config
 
     async def __call__(
             self,
@@ -17,7 +17,6 @@ class DatabaseMiddleware(BaseMiddleware):
             event: TelegramObject,
             data: Dict[str, Any]
     ) -> Any:
+        data['config'] = self.config
 
-        async with self.async_sessionmaker() as session:
-            data['session'] = session
-            return await handler(event, data)
+        return handler(event, data)
