@@ -1,13 +1,13 @@
-from aiogram import Bot, Dispatcher
-from sqlalchemy.orm import sessionmaker
-from aiogram.fsm.storage.redis import RedisStorage
-from aiogram.fsm.storage.memory import MemoryStorage
-from aiogram.dispatcher.middlewares.user_context import UserContextMiddleware
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
-from redis import Redis
-
 import asyncio
 import logging
+
+from aiogram import Bot, Dispatcher
+from aiogram.fsm.storage.memory import MemoryStorage
+from aiogram.fsm.storage.redis import RedisStorage
+from aiogram.dispatcher.middlewares.user_context import UserContextMiddleware
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+from sqlalchemy.orm import sessionmaker
+from redis import Redis
 
 from aiobot.config import load_config
 from aiobot.models.database import Base

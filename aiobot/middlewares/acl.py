@@ -1,8 +1,8 @@
+from typing import Callable, Dict, Any, Awaitable
+
 from aiogram import BaseMiddleware
 from aiogram.types import Update, User
 from sqlalchemy.ext.asyncio import AsyncSession
-
-from typing import Callable, Dict, Any, Awaitable
 
 from ..models.user import User
 
