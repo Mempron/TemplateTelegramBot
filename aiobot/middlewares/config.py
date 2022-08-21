@@ -8,7 +8,6 @@ from ..config import Config
 
 class ConfigMiddleware(BaseMiddleware):
     def __init__(self, config: Config) -> None:
-        super().__init__()
         self.config = config
 
     async def __call__(
@@ -19,4 +18,4 @@ class ConfigMiddleware(BaseMiddleware):
     ) -> Any:
         data['config'] = self.config
 
-        return handler(event, data)
+        return await handler(event, data)

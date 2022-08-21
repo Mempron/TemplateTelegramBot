@@ -2,8 +2,8 @@ import asyncio
 import logging
 
 from aiogram import Bot, Dispatcher
-from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.fsm.storage.redis import RedisStorage
+from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.dispatcher.middlewares.user_context import UserContextMiddleware
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
@@ -26,8 +26,8 @@ logger = logging.getLogger(__name__)
 
 def setup_all_middlewares(dp: Dispatcher, async_sessionmaker: sessionmaker, config: Config) -> None:
     dp.update.outer_middleware(UserContextMiddleware())
+    dp.update.outer_middleware(ConfigMiddleware(config))
     dp.update.outer_middleware(DatabaseMiddleware(async_sessionmaker))
-    # dp.update.outer_middleware(ConfigMiddleware(config))
     dp.update.outer_middleware(AccessControlListMiddleware())
 
 

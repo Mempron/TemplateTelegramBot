@@ -8,7 +8,6 @@ from sqlalchemy.orm import sessionmaker
 class DatabaseMiddleware(BaseMiddleware):
 
     def __init__(self, async_sessionmaker: sessionmaker) -> None:
-        super().__init__()
         self.async_sessionmaker = async_sessionmaker
 
     async def __call__(
