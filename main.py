@@ -36,9 +36,7 @@ def include_all_routers(dp: Dispatcher) -> None:
     dp.include_router(user_router)
 
 
-async def main() -> None:
-    config = load_config()
-
+async def create_sessionmaker(config: Config) -> sessionmaker:
     engine = create_async_engine(
         f'postgresql+asyncpg://{config.db.user}:{config.db.password}@{config.db.host}/{config.db.name}',
         echo=False
@@ -47,11 +45,16 @@ async def main() -> None:
         # await connection.run_sync(Base.metadata.drop_all)  # Drop tables!
         await connection.run_sync(Base.metadata.create_all)
 
-    async_sessionmaker = sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
+    return sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
+
+
+async def main() -> None:
+    config = load_config()
 
     bot = Bot(config.bot.token, parse_mode='HTML')
     storage = RedisStorage(Redis) if config.bot.use_redis else MemoryStorage()
     dp = Dispatcher(storage=storage)
+    async_sessionmaker = await create_sessionmaker(config)
 
     setup_all_middlewares(dp, async_sessionmaker, config)
     include_all_routers(dp)
@@ -66,11 +69,8 @@ async def main() -> None:
         except AttributeError:
             logger.error('Can not close the bot\'s session.')
 
-        await engine.dispose()
-
 
 if __name__ == '__main__':
-
     try:
         asyncio.run(main())
     except (KeyboardInterrupt, SystemExit):
