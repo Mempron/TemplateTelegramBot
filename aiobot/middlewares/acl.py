@@ -27,12 +27,13 @@ class AccessControlListMiddleware(BaseMiddleware):
 
         try:
             user = user.scalar()
+            if user.ban:
+                return
+            data['user'] = user
+            return await handler(update, data)
         except AttributeError:
             return await handler(update, data)
 
-        if user.ban:
-            return
 
-        data['user'] = user
 
-        return await handler(update, data)
+
