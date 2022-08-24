@@ -1,8 +1,9 @@
 from typing import Callable, Dict, Any, Awaitable
 
 from aiogram import BaseMiddleware
-from aiogram.types import Update, User
+from aiogram.types import Update, User as TelegramUser
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
 
 from ..models.user import User
 
@@ -16,18 +17,21 @@ class AccessControlListMiddleware(BaseMiddleware):
             data: Dict[str, Any]
     ) -> Any:
 
-        user_data: User = data.get('event_from_user')
+        user_data: TelegramUser = data.get('event_from_user')
         if not user_data:
-            return
+            return await handler(update, data)
 
         session: AsyncSession = data.get('session')
+        query = select(User).where(User.telegram_id == user_data.id)
+        user = await session.execute(query)
 
-        user = await session.get(User, {'id': user_data.id})
+        try:
+            user = user.scalar()
+        except AttributeError:
+            return await handler(update, data)
 
-        if not user:
-            user = User(id=user_data.id)
-            session.add(user)
-            await session.commit()
+        if user.ban:
+            return
 
         data['user'] = user
 
