@@ -59,7 +59,7 @@ async def show_summary(message: Message, data: Dict[str, Any]) -> None:
 
 @user_router.callback_query(text='yes')
 async def finish_registration(callback: CallbackQuery, state: FSMContext, **kwargs) -> None:
-    await callback.answer('Ваша регистрация успешно завершена')
+    await callback.message.edit_text('Ваша регистрация успешно завершена', reply_markup=None)
     data = await state.get_data()
     name = data.get('name')
     age = data.get('age')
@@ -74,4 +74,5 @@ async def finish_registration(callback: CallbackQuery, state: FSMContext, **kwar
 
 @user_router.callback_query(text='no')
 async def finish_registration(callback: CallbackQuery, state: FSMContext) -> None:
+    await callback.message.edit_text('Ваша регистрация отменена', reply_markup=None)
     await state.clear()

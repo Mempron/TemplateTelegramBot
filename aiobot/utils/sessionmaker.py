@@ -11,7 +11,7 @@ async def create_sessionmaker(config: Config) -> sessionmaker:
         echo=False
     )
     async with engine.begin() as connection:
-        await connection.run_sync(Base.metadata.drop_all)  # Drop tables!
+        # await connection.run_sync(Base.metadata.drop_all)  # Drop tables!
         await connection.run_sync(Base.metadata.create_all)
 
     return sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
