@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 
 async def main() -> None:
-    config: Config = load_config('c.ini')
+    config: Config = load_config()
 
     bot = Bot(config.bot.token, parse_mode='HTML')
     storage = RedisStorage(Redis) if config.bot.use_redis else MemoryStorage()
